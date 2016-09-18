@@ -1,5 +1,7 @@
 # php-simple-static-manager
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/a0183cff-2e8c-4c6d-8466-2756ad374002/big.png)](https://insight.sensiolabs.com/projects/a0183cff-2e8c-4c6d-8466-2756ad374002)
+
 [![Build Status](https://travis-ci.org/alexpts/php-simple-static-manager.svg?branch=master)](https://travis-ci.org/alexpts/php-simple-static-manager)
 [![Test Coverage](https://codeclimate.com/github/alexpts/php-simple-static-manager/badges/coverage.svg)](https://codeclimate.com/github/alexpts/php-simple-static-manager/coverage)
 [![Code Climate](https://codeclimate.com/github/alexpts/php-simple-static-manager/badges/gpa.svg)](https://codeclimate.com/github/alexpts/php-simple-static-manager)
