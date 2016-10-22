@@ -3,11 +3,15 @@ declare(strict_types = 1);
 namespace PTS\StaticManager;
 
 use PTS\Tools\CollectionInterface;
+use PTS\Tools\NotFoundKeyException;
+use Symfony\Component\Asset\PackageInterface;
 
 class StaticManager
 {
     /** @var CollectionInterface[] */
     protected $collections;
+    /** @var PackageInterface[] */
+    protected $packages = [];
 
     public function __construct(CollectionInterface $emptyCollection)
     {
@@ -51,7 +55,7 @@ class StaticManager
 
         $result = '';
         foreach ($scripts as $script) {
-            $result .=  "<script src='" . $script . "'></script>\n";
+            $result .= "<script src='" . $script . "'></script>\n";
         }
 
         return $result;
@@ -68,5 +72,25 @@ class StaticManager
         }
 
         return $result;
+    }
+
+    public function setPackage(string $name, PackageInterface $package)
+    {
+        $this->packages[$name] = $package;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return PackageInterface
+     * @throws NotFoundKeyException
+     */
+    public function getPackage(string $name) : PackageInterface
+    {
+        if (!array_key_exists($name, $this->packages)) {
+            throw new NotFoundKeyException('Package not found');
+        }
+
+        return $this->packages[$name];
     }
 }

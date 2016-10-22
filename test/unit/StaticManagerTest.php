@@ -3,6 +3,9 @@ namespace PTS\StaticManager;
 
 use PTS\Tools\Collection;
 use PTS\Tools\CollectionInterface;
+use PTS\Tools\NotFoundKeyException;
+use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
 class StaticManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -107,5 +110,21 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
                 "<link rel='stylesheet' href='/jquery.css' />\n<link rel='stylesheet' href='/all.css' />\n"
             ]
         ];
+    }
+
+    public function testGetUnknownPackage()
+    {
+        $this->expectException(NotFoundKeyException::class);
+        $this->manager->getPackage('badName');
+    }
+
+    public function testSePackage()
+    {
+        $package = new Package(new EmptyVersionStrategy);
+        $this->manager->setPackage('empty', $package);
+
+        $result = $this->manager->getPackage('empty');
+
+        self::assertEquals($result, $package);
     }
 }
