@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace PTS\StaticManager;
 
 use PTS\Tools\CollectionInterface;
@@ -22,56 +23,82 @@ class StaticManager
         ];
     }
 
-    public function getCssSet() : CollectionInterface
+    public function getCssSet(): CollectionInterface
     {
         return $this->collections['css'];
     }
 
-    public function getJsHeaderSet() : CollectionInterface
+    public function getJsHeaderSet(): CollectionInterface
     {
         return $this->collections['jsHeader'];
     }
 
-    public function getJsFooterSet() : CollectionInterface
+    public function getJsFooterSet(): CollectionInterface
     {
         return $this->collections['jsFooter'];
     }
 
-    public function drawHeaderScripts() : string
+    public function drawHeaderScripts(): string
     {
         $collection = $this->getJsHeaderSet();
         return $this->drawScripts($collection);
     }
 
-    public function drawFooterScripts() : string
+    public function drawFooterScripts(): string
     {
         $collection = $this->getJsFooterSet();
         return $this->drawScripts($collection);
     }
 
-    protected function drawScripts(CollectionInterface $collection) : string
+    protected function drawScripts(CollectionInterface $collection): string
     {
         $scripts = $collection->getFlatItems(true);
 
         $result = '';
-        foreach ($scripts as $script) {
-            $result .= "<script src='" . $script . "'></script>\n";
+        foreach ($scripts as $item) {
+            $item = $this->prepareItem($item, 'src');
+            $attributes = $this->convertToAttributesString($item);
+            $result .= "<script {$attributes}></script>\n";
         }
 
         return $result;
     }
 
-    public function drawStyles() : string
+    protected function convertToAttributesString(array $item): string
+    {
+        return implode(' ', array_map(function ($val, $key) {
+            return "{$key}='{$val}'";
+        }, $item, array_keys($item)));
+    }
+
+    public function drawStyles(): string
     {
         $collection = $this->getCssSet();
         $styles = $collection->getFlatItems(true);
 
         $result = '';
-        foreach ($styles as $style) {
-            $result .= "<link rel='stylesheet' href='" . $style . "' />\n";
+        foreach ($styles as $item) {
+            $item = $this->prepareItem($item, 'href');
+
+            if (!array_key_exists('rel', $item)) {
+                $item['rel'] = 'stylesheet';
+            }
+
+            $attributes = $this->convertToAttributesString($item);
+            $result .= "<link {$attributes}/>\n";
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|array $item
+     * @param string $defaultAttr
+     * @return array
+     */
+    protected function prepareItem($item, $defaultAttr = 'src'): array
+    {
+        return is_string($item) ? [$defaultAttr => $item] : $item;
     }
 
     public function setPackage(string $name, PackageInterface $package)
@@ -85,7 +112,7 @@ class StaticManager
      * @return PackageInterface
      * @throws NotFoundKeyException
      */
-    public function getPackage(string $name) : PackageInterface
+    public function getPackage(string $name): PackageInterface
     {
         if (!array_key_exists($name, $this->packages)) {
             throw new NotFoundKeyException('Package not found');

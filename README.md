@@ -19,11 +19,17 @@ $ composer require alexpts/php-simple-static-manager
 ```php
 $staticManager = new StaticManager(new Collection);
 $css = $staticManager->getCssSet();
+$js = $staticManager->getJsHeaderSet();
 
 $package = new Package(new StaticVersionStrategy('v1'));
 
 $css->addItem('bootstrap2', $package->getUrl('/bootstrap/3.3.6/css/bootstrap.css'));
 $css->addItem('bootstrap', '/bootstrap/3.3.6/css/bootstrap.min.css', 90);
+$css->addItem('bootstrap', ['href' => '/bootstrap/3.3.6/css/bootstrap.min.css', 'rel' => 'less'], 90);
+
+$js->addItem('vue.js', ['src' => '/vue.min.js', 'type' => 'module'], 100);
+$js->addItem('vue-router.js', '/vue-router.min.js');
+$js->addItem('vue-router.js', 'https://yandex.st/vue-resource.min.js', 10); // cdn
 
 echo $staticManager->drawStyles();
 ```

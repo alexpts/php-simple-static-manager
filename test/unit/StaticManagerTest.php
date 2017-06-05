@@ -1,13 +1,14 @@
 <?php
 namespace PTS\StaticManager;
 
+use PHPUnit\Framework\TestCase;
 use PTS\Tools\Collection;
 use PTS\Tools\CollectionInterface;
 use PTS\Tools\NotFoundKeyException;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
-class StaticManagerTest extends \PHPUnit_Framework_TestCase
+class StaticManagerTest extends TestCase
 {
     /** @var StaticManager */
     protected $manager;
@@ -17,13 +18,13 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new StaticManager(new Collection);
     }
 
-    public function testGetCssSet()
+    public function testGetCssSet(): void
     {
         $css = $this->manager->getCssSet();
         self::assertInstanceOf(CollectionInterface::class, $css);
     }
 
-    public function testGetJsSet()
+    public function testGetJsSet(): void
     {
         $footerJs = $this->manager->getJsFooterSet();
         $headerJs = $this->manager->getJsHeaderSet();
@@ -38,7 +39,7 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider dataProviderJs
      */
-    public function testDrawFooterScripts(array $resources, string $expected)
+    public function testDrawFooterScripts(array $resources, string $expected): void
     {
         $set = $this->manager->getJsFooterSet();
         foreach ($resources as $name => $url) {
@@ -56,7 +57,7 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider dataProviderJs
      */
-    public function testDrawHeaderScripts(array $resources, string $expected)
+    public function testDrawHeaderScripts(array $resources, string $expected): void
     {
         $set = $this->manager->getJsHeaderSet();
         foreach ($resources as $name => $url) {
@@ -73,7 +74,7 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider dataProviderCss
      */
-    public function testDrawStyles(array $resources, string $expected)
+    public function testDrawStyles(array $resources, string $expected): void
     {
         $set = $this->manager->getCssSet();
         foreach ($resources as $name => $url) {
@@ -84,7 +85,7 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expected, $html);
     }
 
-    public function dataProviderJs()
+    public function dataProviderJs(): array
     {
         return [
             [
@@ -94,31 +95,39 @@ class StaticManagerTest extends \PHPUnit_Framework_TestCase
             [
                 ['jquery' => '/jquery.js', 'all' => '/all.js'],
                 "<script src='/jquery.js'></script>\n<script src='/all.js'></script>\n"
-            ]
+            ],
+            [
+                ['jquery' => ['src' => '/jquery.js', 'type' => 'module']],
+                "<script src='/jquery.js' type='module'></script>\n"
+            ],
         ];
     }
 
-    public function dataProviderCss()
+    public function dataProviderCss(): array
     {
         return [
             [
                 ['jquery' => '/jquery.css'],
-                "<link rel='stylesheet' href='/jquery.css' />\n"
+                "<link href='/jquery.css' rel='stylesheet'/>\n"
             ],
             [
                 ['jquery' => '/jquery.css', 'all' => '/all.css'],
-                "<link rel='stylesheet' href='/jquery.css' />\n<link rel='stylesheet' href='/all.css' />\n"
-            ]
+                "<link href='/jquery.css' rel='stylesheet'/>\n<link href='/all.css' rel='stylesheet'/>\n"
+            ],
+            [
+                ['jquery' => ['href' => '/jquery.css'], 'all' => ['href' => '/all.css', 'rel' => 'less']],
+                "<link href='/jquery.css' rel='stylesheet'/>\n<link href='/all.css' rel='less'/>\n"
+            ],
         ];
     }
 
-    public function testGetUnknownPackage()
+    public function testGetUnknownPackage(): void
     {
         $this->expectException(NotFoundKeyException::class);
         $this->manager->getPackage('badName');
     }
 
-    public function testSePackage()
+    public function testSePackage(): void
     {
         $package = new Package(new EmptyVersionStrategy);
         $this->manager->setPackage('empty', $package);
